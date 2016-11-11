@@ -55,7 +55,7 @@ def run(source=0, dispLoc=False):
 	hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 
 	# define range of blue color in HSV
-	lower_green = np.array([86,159,000])
+	lower_green = np.array([121,103,040])
 	upper_green = np.array([180,255,255])
 
 	#Threshold the HSV image to get only blue colors
@@ -68,13 +68,17 @@ def run(source=0, dispLoc=False):
 	(contours,hierarchy)=cv2.findContours(green_mask,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
 	for pic, contour in enumerate(contours):
 	    area = cv2.contourArea(contour)
+	    
 	    #print area
 	    if (area>250):	
 		x,y,w,h = cv2.boundingRect(contour)
+		M = cv2.moments(contour)
+		cx = int(M['m10']/M['m00'])
+    		cy = int(M['m01']/M['m00'])
 		#print x,y,w,h
                 imgr = cv2.rectangle(img,(x-40,y),(x+w+30,y+h),(0,0,255),2)
 		cv2.putText(img,"Pen drive",(x,y),cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0,0,255),2)
-
+		#cv2.putText(img,"C",(cx,cy),cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0,0,255),2)
         for i in xrange(len(tracker)):
             tracker[i].update(img)
             # Get the position of th object, draw a 
@@ -88,7 +92,9 @@ def run(source=0, dispLoc=False):
             loc = (int(rect.left()), int(rect.top()-20))
 	    txt = "Object tracked at [{}, {}]".format(pt1, pt2)
 	    cv2.putText(img, "RaspberryPi", loc , cv2.FONT_HERSHEY_SIMPLEX, .7, (255,0,255), 2)
-
+	
+	    cv2.line(img,pt1,(cx,cy),(255,0,0),5)
+	    cv2.circle(img, pt1,5,(0,255,0),2)
 	cv2.namedWindow("Image", cv2.WINDOW_NORMAL)
         cv2.imshow("Image", img)
         # Continue until the user presses ESC key
